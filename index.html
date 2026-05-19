@@ -1517,24 +1517,41 @@ function renderHome() {
     upcomingCard.style.display = 'none';
   }
 
-  // ③ 도장판
+  // ③ 도장판 (슬라이드 카드)
   const boards = getStampBoards();
-  document.getElementById('home-stamps').innerHTML = boards.length===0
-    ? `<div style="color:var(--text3);font-size:13px;text-align:center;padding:8px;">도장판이 없습니다</div>`
-    : boards.map(b => {
-        const { cur, final } = calcStampCounts(b);
-        const scheduledPct = Math.min(100, Math.round(final / b.totalSlots * 100));
-        const actualPct    = Math.min(100, Math.round(cur   / b.totalSlots * 100));
-        const done = cur >= b.totalSlots;
-        return `<div class="home-stamp-row">
-          <div class="home-stamp-name">[📡 ${b.name}]${done?' 🎉':''}</div>
-          <div class="home-stamp-bar">
-            <div class="home-stamp-bar-fill scheduled" style="width:${scheduledPct}%"></div>
-            <div class="home-stamp-bar-fill actual"    style="width:${actualPct}%"></div>
+  if (boards.length === 0) {
+    document.getElementById('home-stamps').innerHTML =
+      `<div style="color:var(--text3);font-size:13px;text-align:center;padding:8px;">도장판이 없습니다</div>`;
+  } else {
+    const slides = boards.map(b => {
+      const { cur, final } = calcStampCounts(b);
+      const total = b.totalSlots || 7;
+      const done  = cur >= total;
+      let dots = '';
+      for (let i = 1; i <= total; i++) {
+        const filled    = i <= cur;
+        const scheduled = i > cur && i <= final;
+        const ms = (b.milestones||[]).find(m => m.at === i);
+        const msLabel = ms ? (i === 3 ? '50%' : i === 7 ? 'OST' : '') : '';
+        dots += `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <div style="width:28px;height:28px;border-radius:50%;
+            background:${filled ? 'var(--accent)' : scheduled ? 'rgba(26,95,255,0.12)' : 'var(--bg3)'};
+            border:2px solid ${filled ? 'var(--accent)' : scheduled ? 'var(--accent)' : 'var(--border)'};
+            display:flex;align-items:center;justify-content:center;font-size:12px;">
+            ${filled ? '📡' : ''}
           </div>
-          <div class="home-stamp-count">현재:${cur} / 예정:${final}</div>
+          <div style="font-size:7px;font-weight:700;color:${msLabel ? 'var(--accent)' : 'transparent'};">${msLabel||'.'}</div>
         </div>`;
-      }).join('');
+      }
+      return `<div style="min-width:min(88%,280px);scroll-snap-align:start;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 10px;flex-shrink:0;">
+        <div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:10px;">[📡 ${b.name}]${done?' 🎉':''}</div>
+        <div style="display:flex;gap:4px;justify-content:center;margin-bottom:4px;">${dots}</div>
+        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:2px;">현재 ${cur}칸 · 예정 ${final}칸</div>
+      </div>`;
+    }).join('');
+    document.getElementById('home-stamps').innerHTML =
+      `<div style="overflow-x:auto;scroll-snap-type:x mandatory;display:flex;gap:10px;-webkit-overflow-scrolling:touch;padding:2px 2px 6px;">${slides}</div>`;
+  }
 
   // ④ 쿠폰
   const coupons = getCoupons();
@@ -1585,9 +1602,9 @@ function renderHome() {
       </div>`;
     }).join('')}</div>`;
 
-  // ⑤ 최근 관람 (이미 지난 것 또는 미정)
+  // ⑤ 최근 관람 (오늘 포함 이전 기록)
   const pastAll = records
-    .filter(r => r.date < today)
+    .filter(r => r.date <= today)
     .sort((a,b)=>b.date.localeCompare(a.date)||b.time.localeCompare(a.time));
   const showCount = DB.get('homeRecentCount', 3);
   const past = pastAll.slice(0, showCount);

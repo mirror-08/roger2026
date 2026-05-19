@@ -1545,8 +1545,8 @@ function renderHome() {
       }
       const cardStyle = boards.length === 1
         ? 'width:100%;'
-        : 'min-width:min(88%,300px);scroll-snap-align:start;flex-shrink:0;';
-      return `<div style="${cardStyle}background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 12px;">
+        : 'min-width:100%;scroll-snap-align:start;flex-shrink:0;';
+      return `<div style="${cardStyle}box-sizing:border-box;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 12px;">
         <div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:12px;">[📻 ${b.name}]${done?' 🎉':''}</div>
         <div style="display:flex;gap:6px;justify-content:center;margin-bottom:4px;">${dots}</div>
         <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px;">현재 ${cur}칸 · 예정 ${final}칸</div>
@@ -1554,7 +1554,7 @@ function renderHome() {
     }).join('');
     const wrapStyle = boards.length === 1
       ? ''
-      : 'overflow-x:auto;scroll-snap-type:x mandatory;display:flex;gap:10px;-webkit-overflow-scrolling:touch;padding:2px 2px 6px;';
+      : 'overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;display:flex;-webkit-overflow-scrolling:touch;padding:2px 0 6px;';
     document.getElementById('home-stamps').innerHTML =
       `<div style="${wrapStyle}">${slides}</div>`;
   }

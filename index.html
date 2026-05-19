@@ -2688,12 +2688,8 @@ function renderCouponList() {
   const records = getRecords();
   const today   = localDate();
 
-  // 이력 접힘 상태 복원 (디폴트: 접힘)
-  const histCollapsed = DB.get('couponHistoryCollapsed', true);
   const histWrap = document.getElementById('coupon-history-wrap');
-  const histIcon = document.getElementById('coupon-history-toggle-icon');
-  if (histWrap) histWrap.style.display = histCollapsed ? 'none' : '';
-  if (histIcon) histIcon.textContent   = histCollapsed ? '▼' : '▲';
+  if (histWrap) histWrap.style.display = '';
 
   // 최종 = 날짜 제한 없이 전체 + 미달성 milestone
   function calcFinal(key) {
@@ -2799,9 +2795,10 @@ function renderCouponAllHistory() {
       : `<span class="hist-type-use">사용</span>`;
     const qty   = h.qty || 1;
     const delta = isGet ? `<span class="hist-delta-pos">+${qty}</span>` : `<span class="hist-delta-neg">-${qty}</span>`;
-    const d40   = h.key === 'discount40'   ? delta : '';
-    const d50   = h.key === 'discount50'   ? delta : '';
-    const dPass = h.key === 'discountPass' ? delta : '';
+    const d40     = h.key === 'discount40'   ? delta : '';
+    const d50     = h.key === 'discount50'   ? delta : '';
+    const dPass   = h.key === 'discountPass' ? delta : '';
+    const dDouble = h.key === 'doubleStamp'  ? delta : '';
     const milestoneBadge = h.isMilestone ? `<span class="hist-milestone-badge">달성</span>` : '';
     const memo  = `${h.comment || ''}${milestoneBadge}`;
     const delBtn = h.rowType === 'manual'
@@ -2810,7 +2807,7 @@ function renderCouponAllHistory() {
     return `<tr>
       <td style="text-align:left;white-space:nowrap;">${dateStr}</td>
       <td>${typeHtml}</td>
-      <td>${d40}</td><td>${d50}</td><td>${dPass}</td>
+      <td>${d40}</td><td>${d50}</td><td>${dPass}</td><td>${dDouble}</td>
       <td style="text-align:left;color:var(--text2);font-size:11px;">${memo}</td>
       <td>${delBtn}</td>
     </tr>`;

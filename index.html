@@ -405,10 +405,7 @@
     <div id="home-coupons"></div>
   </div>
   <div class="card">
-    <div class="card-title" onclick="toggleHomeStamps()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
-      <span>📡 교신일지 현황</span>
-      <span id="home-stamps-toggle-icon" style="font-size:11px;color:var(--text3);">▲</span>
-    </div>
+    <div class="card-title">📡 교신일지 현황</div>
     <div id="home-stamps-wrap">
       <div id="home-stamps" style="margin-top:8px;"></div>
     </div>
@@ -478,11 +475,8 @@
 
   <!-- 전체 이력 표 -->
   <div class="card" style="margin-bottom:16px;">
-    <div class="card-title" onclick="toggleCouponHistory()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
-      <span>할인권 상세 기록</span>
-      <span id="coupon-history-toggle-icon" style="font-size:11px;color:var(--text3);">▼</span>
-    </div>
-    <div id="coupon-history-wrap" style="display:none;">
+    <div class="card-title">할인권 상세 기록</div>
+    <div id="coupon-history-wrap">
       <div id="coupon-all-history" style="margin-top:8px;"></div>
     </div>
   </div>
@@ -973,6 +967,7 @@ function getCoupons() {
   if (!c.discount40)   c.discount40   = { count: 0, history: [] };
   if (!c.discount50)   c.discount50   = { count: 0, history: [] };
   if (!c.discountPass) c.discountPass = { count: 0, history: [] };
+  if (!c.doubleStamp)  c.doubleStamp  = { count: 0, history: [] };
   if (!c.liveOST)      c.liveOST      = { count: 0, history: [] };
   return c;
 }
@@ -2146,6 +2141,7 @@ function renderStampBoards() {
     else if (toNext !== null) statusHtml = `<div class="stamp-status-row stamp-status-next">다음까지 ${toNext}개</div>`;
 
     const marker3 = (3 / total * 100).toFixed(2);
+    const marker7 = (7 / total * 100).toFixed(2);
 
     return `<div class="stamp-board${paused ? ' paused' : ''}">
       <div class="stamp-board-header">
@@ -2165,7 +2161,7 @@ function renderStampBoards() {
           <div class="progress-fill" style="width:${finalPct}%;background:var(--border);border-radius:6px;"></div>
           <div class="progress-fill" style="width:${pct}%;background:${paused ? 'var(--text3)' : 'var(--accent)'};border-radius:6px;margin-top:-12px;position:relative;"></div>
           <div class="progress-marker" style="left:calc(${marker3}% - 1px);"></div>
-          <div class="progress-marker" style="left:calc(${marker5}% - 1px);background:var(--accent);"></div>
+          <div class="progress-marker" style="left:calc(${marker7}% - 1px);background:var(--accent);"></div>
         </div>
       </div>
       ${statusHtml}
@@ -2642,6 +2638,7 @@ const COUPON_ITEMS = [
   { key:'discount40',   label:'40% 할인권', short:'40%' },
   { key:'discount50',   label:'50% 할인권', short:'50%' },
   { key:'discountPass', label:'증빙패스',   short:'증빙' },
+  { key:'doubleStamp',  label:'더블적립권', short:'더블' },
   { key:'liveOST',      label:'실황 OST',   short:'OST'  }
 ];
 

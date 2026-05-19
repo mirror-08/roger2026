@@ -1,1 +1,17 @@
-[]
+[
+  { "startDate": "2026-03-05", "endDate": "2026-03-08", "name": "프리뷰",              "color": "#4caf50" },
+  { "startDate": "2026-03-05", "endDate": "2026-03-07", "name": "무대인사",             "color": "#1a8fea" },
+  { "startDate": "2026-03-05", "endDate": "2026-03-08", "name": "캐릭터포스터 업서증정", "color": "#e73c7e" },
+  { "startDate": "2026-03-05", "endDate": "2026-03-22", "name": "쿠폰팩 증정",          "color": "#ff9800" },
+  { "startDate": "2026-03-09", "endDate": "2026-03-15", "name": "커튼콜 위크",          "color": "#9c27b0" },
+  { "startDate": "2026-03-30", "endDate": "2026-04-05", "name": "스페셜 커튼콜",        "color": "#9c27b0" },
+  { "startDate": "2026-04-06", "endDate": "2026-04-12", "name": "트리플적립",           "color": "#ff9800" },
+  { "startDate": "2026-04-14", "endDate": "2026-04-19", "name": "폴라로이드 사진 증정", "color": "#4caf50" },
+  { "startDate": "2026-04-21", "endDate": "2026-04-26", "name": "미공개 공연사진 포토카드 증정", "color": "#9c27b0" },
+  { "startDate": "2026-04-28", "endDate": "2026-05-03", "name": "하이터치 이벤트",      "color": "#f44336" },
+  { "startDate": "2026-05-05", "endDate": "2026-05-10", "name": "스페셜 커튼콜",        "color": "#d63184" },
+  { "startDate": "2026-05-12", "endDate": "2026-05-17", "name": "럭키드로우",           "color": "#ff9800" },
+  { "startDate": "2026-05-19", "endDate": "2026-05-24", "name": "커튼콜 위크",          "color": "#9c27b0" },
+  { "startDate": "2026-05-25", "endDate": "2026-05-31", "name": "굿바이 셀카 포토카드 증정", "color": "#4caf50" },
+  { "startDate": "2026-05-30", "endDate": "2026-05-31", "name": "막공 무대인사",        "color": "#1a8fea" }
+]

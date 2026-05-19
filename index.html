@@ -482,7 +482,10 @@
   </div>
 
   <!-- 다관람 카드 -->
-  <div class="section-title" style="margin-bottom:8px;">교신일지</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <div class="section-title">교신일지</div>
+    <div style="font-size:11px;color:var(--text3);">3칸 : 50% 할인권 / 7칸 : OST 실황</div>
+  </div>
   <div id="stamp-boards-list" style="margin-bottom:16px;"></div>
 </div>
 
@@ -1540,19 +1543,22 @@ function renderHome() {
     }, 0);
     return cur + future;
   }
-  const c40    = calcCouponCount('discount40',   coupons, boards, records, todayStr);
-  const c50    = calcCouponCount('discount50',   coupons, boards, records, todayStr);
-  const cPass  = calcCouponCount('discountPass', coupons, boards, records, todayStr);
-  const cOST   = calcCouponCount('liveOST',      coupons, boards, records, todayStr);
-  const f40    = homeCouponFinal('discount40');
-  const f50    = homeCouponFinal('discount50');
-  const fPass  = homeCouponFinal('discountPass');
-  const fOST   = homeCouponFinal('liveOST');
+  const c40     = calcCouponCount('discount40',   coupons, boards, records, todayStr);
+  const c50     = calcCouponCount('discount50',   coupons, boards, records, todayStr);
+  const cPass   = calcCouponCount('discountPass', coupons, boards, records, todayStr);
+  const cDouble = calcCouponCount('doubleStamp',  coupons, boards, records, todayStr);
+  const cOST    = calcCouponCount('liveOST',      coupons, boards, records, todayStr);
+  const f40     = homeCouponFinal('discount40');
+  const f50     = homeCouponFinal('discount50');
+  const fPass   = homeCouponFinal('discountPass');
+  const fDouble = homeCouponFinal('doubleStamp');
+  const fOST    = homeCouponFinal('liveOST');
   const homeCouponItems = [
-    { key:'discount40',   label:'40% 할인권', cur:c40,   final:f40   },
-    { key:'discount50',   label:'50% 할인권', cur:c50,   final:f50   },
-    { key:'discountPass', label:'증빙패스',   cur:cPass, final:fPass  },
-    { key:'liveOST',      label:'실황 OST',   cur:cOST,  final:fOST  }
+    { key:'discount40',   label:'40% 할인권', cur:c40,     final:f40     },
+    { key:'discount50',   label:'50% 할인권', cur:c50,     final:f50     },
+    { key:'discountPass', label:'증빙패스',   cur:cPass,   final:fPass   },
+    { key:'doubleStamp',  label:'더블적립권', cur:cDouble, final:fDouble },
+    { key:'liveOST',      label:'실황 OST',   cur:cOST,    final:fOST    }
   ];
   document.getElementById('home-coupons').innerHTML =
     `<div class="coupon-cards">${homeCouponItems.map(item => {
@@ -2066,14 +2072,6 @@ function renderStampBoards() {
   const allDone = boards.length === 0 || boards.every(b => b.currentCount >= b.totalSlots);
   let html = '';
 
-  if (allDone) {
-    html += `<div style="text-align:center;padding:12px 0 8px;">
-      <button class="btn btn-primary" onclick="openAddStampBoard()" style="width:100%;padding:14px;">
-        🆕 새 다관람 카드 시작하기
-      </button>
-      <p style="font-size:12px;color:var(--text3);margin-top:8px;">7칸 · 3칸:50%할인권×1 · 7칸:실황OST</p>
-    </div>`;
-  }
 
   if (boards.length === 0) {
     document.getElementById('stamp-boards-list').innerHTML = html;

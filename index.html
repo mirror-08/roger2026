@@ -482,7 +482,10 @@
 
   <!-- 다관람 카드 -->
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-    <div class="section-title">교신일지</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="section-title">교신일지</div>
+      <button class="btn btn-outline btn-sm" onclick="openAddStampBoard()">+ 교신일지</button>
+    </div>
     <div style="font-size:11px;color:var(--text3);">3칸 : 50% 할인권 / 7칸 : OST 실황</div>
   </div>
   <div id="stamp-boards-list" style="margin-bottom:16px;"></div>
@@ -2073,7 +2076,6 @@ function renderStampBoards() {
 
 
   if (boards.length === 0) {
-    html += `<button class="btn btn-primary" onclick="openAddStampBoard()" style="width:100%;padding:14px;">+ 교신일지</button>`;
     document.getElementById('stamp-boards-list').innerHTML = html;
     return;
   }
@@ -2130,7 +2132,6 @@ function renderStampBoards() {
   }).join('');
 
   html += `<div class="stamp-cards-grid">${cards}</div>`;
-  html += `<button class="btn btn-primary" onclick="openAddStampBoard()" style="width:100%;padding:14px;margin-top:8px;">+ 교신일지</button>`;
   document.getElementById('stamp-boards-list').innerHTML = html;
 }
 

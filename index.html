@@ -1534,23 +1534,29 @@ function renderHome() {
         const ms = (b.milestones||[]).find(m => m.at === i);
         const msLabel = ms ? (i === 3 ? '50%' : i === 7 ? 'OST' : '') : '';
         dots += `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <div style="width:28px;height:28px;border-radius:50%;
-            background:${filled ? 'var(--accent)' : scheduled ? 'rgba(26,95,255,0.12)' : 'var(--bg3)'};
+          <div style="width:36px;height:36px;border-radius:50%;
+            background:${filled ? 'transparent' : scheduled ? 'rgba(26,95,255,0.08)' : 'var(--bg3)'};
             border:2px solid ${filled ? 'var(--accent)' : scheduled ? 'var(--accent)' : 'var(--border)'};
-            display:flex;align-items:center;justify-content:center;font-size:12px;">
-            ${filled ? '📡' : ''}
+            display:flex;align-items:center;justify-content:center;font-size:18px;">
+            ${filled ? '📻' : ''}
           </div>
-          <div style="font-size:7px;font-weight:700;color:${msLabel ? 'var(--accent)' : 'transparent'};">${msLabel||'.'}</div>
+          <div style="font-size:8px;font-weight:700;color:${msLabel ? 'var(--accent)' : 'transparent'};">${msLabel||'.'}</div>
         </div>`;
       }
-      return `<div style="min-width:min(88%,280px);scroll-snap-align:start;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 10px;flex-shrink:0;">
-        <div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:10px;">[📡 ${b.name}]${done?' 🎉':''}</div>
-        <div style="display:flex;gap:4px;justify-content:center;margin-bottom:4px;">${dots}</div>
-        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:2px;">현재 ${cur}칸 · 예정 ${final}칸</div>
+      const cardStyle = boards.length === 1
+        ? 'width:100%;'
+        : 'min-width:min(88%,300px);scroll-snap-align:start;flex-shrink:0;';
+      return `<div style="${cardStyle}background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 12px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:12px;">[📻 ${b.name}]${done?' 🎉':''}</div>
+        <div style="display:flex;gap:6px;justify-content:center;margin-bottom:4px;">${dots}</div>
+        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px;">현재 ${cur}칸 · 예정 ${final}칸</div>
       </div>`;
     }).join('');
+    const wrapStyle = boards.length === 1
+      ? ''
+      : 'overflow-x:auto;scroll-snap-type:x mandatory;display:flex;gap:10px;-webkit-overflow-scrolling:touch;padding:2px 2px 6px;';
     document.getElementById('home-stamps').innerHTML =
-      `<div style="overflow-x:auto;scroll-snap-type:x mandatory;display:flex;gap:10px;-webkit-overflow-scrolling:touch;padding:2px 2px 6px;">${slides}</div>`;
+      `<div style="${wrapStyle}">${slides}</div>`;
   }
 
   // ④ 쿠폰

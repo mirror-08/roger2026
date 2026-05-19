@@ -659,16 +659,20 @@
       <label class="form-label">할인권종 <span style="color:var(--text3);font-weight:400;">(선택)</span></label>
       <select class="form-control" id="rec-discount-type" onchange="onDiscountTypeChange()">
         <option value="">없음 (일반)</option>
-        <option value="40% 할인권">40% 할인권 (40%)</option>
-        <option value="50% 할인권">50% 할인권 (50%)</option>
-        <option value="증빙패스">증빙패스</option>
         <option value="프리뷰 할인">프리뷰 할인(40%)</option>
-        <option value="조기예매 할인">조기예매 할인</option>
+        <option value="조기예매 할인">조기예매 할인 (25%)</option>
         <option value="재관람 할인">재관람 할인 (30%)</option>
-        <option value="MJ Starfish 할인">MJ Starfish 할인 (25%)</option>
-        <option value="타임세일">타임세일</option>
-        <option value="마티네">마티네 (30%)</option>
+        <option value="직장인 할인">직장인 할인 (10%)</option>
+        <option value="예술인패스 할인">예술인패스 할인 (20%)</option>
+        <option value="마티네">마티네 할인 (30%)</option>
+        <option value="청소년 할인">청소년 할인</option>
+        <option value="창작산실 우수매니아 할인">창작산실 우수매니아 할인 (30%)</option>
+        <option value="40% 할인권">40% 할인권 소지자 (40%)</option>
+        <option value="50% 할인권">50% 할인권 소지자 (50%)</option>
+        <option value="문화누리카드 소지자 할인">문화누리카드 소지자 할인 (50%)</option>
         <option value="장애인/국가유공자">장애인/국가유공자 (50%)</option>
+        <option value="증빙패스">증빙패스</option>
+        <option value="타임세일">타임세일</option>
         <option value="기타">기타</option>
       </select>
       <div id="rec-discount-warn" style="display:none;margin-top:6px;font-size:12px;color:var(--danger);">⚠ 현재 보유한 쿠폰이 없습니다</div>
@@ -2577,16 +2581,20 @@ const DISCOUNT_COUPON_MAP = {
   '증빙패스': 'discountPass'
 };
 const DISCOUNT_LABEL = {
-  '40% 할인권': '40% 할인권',
-  '50% 할인권': '50% 할인권',
-  '증빙패스': '증빙패스',
   '프리뷰 할인': '프리뷰 할인(40%)',
-  '타임세일': '타임세일',
-  '조기예매 할인': '조기예매 할인',
+  '조기예매 할인': '조기예매 할인 (25%)',
   '재관람 할인': '재관람 할인 (30%)',
-  'MJ Starfish 할인': 'MJ Starfish 할인 (25%)',
-  '마티네': '마티네 (30%)',
+  '직장인 할인': '직장인 할인 (10%)',
+  '예술인패스 할인': '예술인패스 할인 (20%)',
+  '마티네': '마티네 할인 (30%)',
+  '청소년 할인': '청소년 할인',
+  '창작산실 우수매니아 할인': '창작산실 우수매니아 할인 (30%)',
+  '40% 할인권': '40% 할인권 소지자 (40%)',
+  '50% 할인권': '50% 할인권 소지자 (50%)',
+  '문화누리카드 소지자 할인': '문화누리카드 소지자 할인 (50%)',
   '장애인/국가유공자': '장애인/국가유공자 (50%)',
+  '증빙패스': '증빙패스',
+  '타임세일': '타임세일',
   '기타': '기타'
 };
 

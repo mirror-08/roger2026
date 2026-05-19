@@ -509,15 +509,7 @@
       <div class="legend-item"><div class="legend-dot" style="background:var(--seat5)"></div>5회+</div>
     </div>
   </div>
-  <div class="card">
-    <div class="flex-between" style="margin-bottom:8px;">
-      <div class="card-title" style="margin:0;">💰 지출 현황</div>
-      <button class="btn btn-outline btn-sm" id="money-reveal-btn" onclick="toggleMoneyBlur()">👁👁</button>
-    </div>
-    <div class="money-blur-wrap blurred" id="money-blur">
-      <div id="stats-money"></div>
-    </div>
-  </div>
+
 </div>
 
 <!-- ========== SETTINGS ========== -->
@@ -678,11 +670,6 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">티켓 가격 (원)</label>
-      <input type="number" class="form-control" id="rec-price" placeholder="예: 45000">
-    </div>
-
-    <div class="form-group">
       <label class="form-label">한줄 코멘트</label>
       <input type="text" class="form-control" id="rec-comment" placeholder="예매처, 도장교환 상대 등">
     </div>
@@ -710,22 +697,6 @@
           </label>
         </div>
       </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">별점</label>
-      <div class="star-group" id="star-group">
-        <button class="star-btn" onclick="setStar(1)">☆</button>
-        <button class="star-btn" onclick="setStar(2)">☆</button>
-        <button class="star-btn" onclick="setStar(3)">☆</button>
-        <button class="star-btn" onclick="setStar(4)">☆</button>
-        <button class="star-btn" onclick="setStar(5)">☆</button>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">감상 메모</label>
-      <textarea class="form-control" id="rec-memo" placeholder="자유롭게 기록해보세요..."></textarea>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:8px;">
@@ -1953,9 +1924,9 @@ function renderStats() {
   document.getElementById('stats-actors').innerHTML = ah;
 
   const pairs = [
-    ['이승준','차규민'],['이승준','이동연'],['이승준','박경호'],
-    ['이세헌','차규민'],['이세헌','이동연'],['이세헌','박경호'],
-    ['함태규','차규민'],['함태규','이동연'],['함태규','박경호']
+    ['주민진','정휘'],['주민진','이한솔'],['주민진','박주혁'],
+    ['고상호','정휘'],['고상호','이한솔'],['고상호','박주혁'],
+    ['기세중','정휘'],['기세중','이한솔'],['기세중','박주혁']
   ];
   let ph = '<tr><th>스카일러</th><th>디디</th><th>총 회차</th><th>관람</th></tr>';
   pairs.forEach(([s,d]) => {
@@ -1968,17 +1939,6 @@ function renderStats() {
 
   renderHeatmap();
 
-  const paid  = records.filter(r=>r.price != null && r.price !== '');
-  const total = paid.reduce((s,r)=>s+(r.price||0),0);
-  const avg   = paid.length ? Math.round(total/paid.length) : 0;
-  document.getElementById('stats-money').innerHTML = `
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">총 지출</span><span style="font-weight:700;">₩${total.toLocaleString()}</span></div>
-    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">평균 티켓가</span><span style="font-weight:700;">₩${avg.toLocaleString()}</span></div>
-    <div style="display:flex;justify-content:space-between;padding:8px 0"><span style="color:var(--text2)">유료 관람 횟수</span><span style="font-weight:700;">${paid.length}회</span></div>`;
-
-  // maintain blur state
-  const blurEl = document.getElementById('money-blur');
-  if (moneyBlurred) blurEl.classList.add('blurred'); else blurEl.classList.remove('blurred');
 }
 
 function renderHeatmap() {

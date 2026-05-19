@@ -483,7 +483,7 @@
   <!-- 다관람 카드 -->
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
     <div style="display:flex;align-items:center;gap:8px;">
-      <div class="section-title">교신일지</div>
+      <div style="font-size:12px;font-weight:700;color:var(--text2);">교신일지</div>
       <button class="btn btn-outline btn-sm" onclick="openAddStampBoard()">+ 교신일지</button>
     </div>
     <div style="font-size:11px;color:var(--text3);">3칸 : 50% 할인권 / 7칸 : OST 실황</div>
@@ -1898,17 +1898,6 @@ function openAddRecordFromSchedule(date, time, alex, philo) {
 }
 
 
-// ============================================================
-// STATS (지출만 blur)
-// ============================================================
-let moneyBlurred = true;
-function toggleMoneyBlur() {
-  moneyBlurred = !moneyBlurred;
-  const el  = document.getElementById('money-blur');
-  const btn = document.getElementById('money-reveal-btn');
-  if (moneyBlurred) { el.classList.add('blurred'); btn.textContent='👁👁'; }
-  else              { el.classList.remove('blurred'); btn.textContent='다시 숨기기 😌'; }
-}
 
 function renderStats() {
   const records  = getRecords();

@@ -1103,15 +1103,12 @@ function openAddRecord(date) {
   document.getElementById('rec-zone').value = '';
   document.getElementById('rec-row').value = '';
   document.getElementById('rec-num').value = '';
-  document.getElementById('rec-price').value = '';
   document.getElementById('rec-discount-type').value = '';
   document.getElementById('rec-discount-warn').style.display = 'none';
   document.getElementById('rec-comment').value = '';
-  document.getElementById('rec-memo').value = '';
   document.getElementById('rec-unconfirmed').checked = false; // default: confirmed (isBooked=true)
   populateStampSelect();
   document.getElementById('rec-stamp-board').value = '';
-  resetStars();
   if (date) autoFillCasting();
   openPanel('overlay-record');
 }
@@ -1131,11 +1128,9 @@ function editRecord(id) {
   document.getElementById('rec-zone').value = r.seatZone||'';
   document.getElementById('rec-row').value = r.seatRow != null ? r.seatRow : '';
   document.getElementById('rec-num').value = r.seatNumber||'';
-  document.getElementById('rec-price').value = r.price||'';
   document.getElementById('rec-discount-type').value = r.discountType||'';
   document.getElementById('rec-discount-warn').style.display = 'none';
   document.getElementById('rec-comment').value = r.comment||'';
-  document.getElementById('rec-memo').value = r.memo||'';
   // isBooked: true by default; unconfirmed = !isBooked
   // isBooked === false 이면 미정 (명시적 false 비교)
   document.getElementById('rec-unconfirmed').checked = r.isBooked === false;
@@ -1147,7 +1142,6 @@ function editRecord(id) {
     const qtyEl = document.querySelector(`input[name="rec-stamp-qty"][value="${r.stampQty}"]`);
     if (qtyEl) { qtyEl.checked = true; updateRecQtyLabel(); }
   }
-  setStar(r.rating||0);
   openPanel('overlay-record');
 }
 
@@ -1162,7 +1156,6 @@ function saveRecord() {
   const editId   = document.getElementById('edit-record-id').value;
   const rowVal   = document.getElementById('rec-row').value;
   const numVal   = document.getElementById('rec-num').value;
-  const priceVal = document.getElementById('rec-price').value;
   const isBooked = !document.getElementById('rec-unconfirmed').checked;
   const stampBoardId  = document.getElementById('rec-stamp-board').value;
   const recQtyEl      = document.querySelector('input[name="rec-stamp-qty"]:checked');
@@ -1193,13 +1186,13 @@ function saveRecord() {
     seatZone:     document.getElementById('rec-zone').value||null,
     seatRow:      rowVal!=='' ? parseInt(rowVal) : null,
     seatNumber:   numVal!=='' ? parseInt(numVal) : null,
-    price:        priceVal!=='' ? parseInt(priceVal) : null,
+    price:        null,
     discountType: discountType,
     stampBoardId: stampBoardId || null,
     stampQty:     stampBoardId ? stampQty : null,
-    rating:       currentStar,
+    rating:       null,
     comment:      document.getElementById('rec-comment').value.trim(),
-    memo:         document.getElementById('rec-memo').value.trim(),
+    memo:         null,
     createdAt:    editId ? (prevRecord?.createdAt||new Date().toISOString()) : new Date().toISOString(),
     updatedAt:    new Date().toISOString()
   };

@@ -460,7 +460,6 @@
 <div class="page" id="page-coupon">
   <div class="page-header">
     <div class="page-title">쿠폰·도장</div>
-    <button class="btn btn-outline btn-sm" onclick="openAddStampBoard()">+ 교신일지</button>
   </div>
 
   <!-- 쿠폰 현황 -->
@@ -2074,6 +2073,7 @@ function renderStampBoards() {
 
 
   if (boards.length === 0) {
+    html += `<button class="btn btn-primary" onclick="openAddStampBoard()" style="width:100%;padding:14px;">+ 교신일지</button>`;
     document.getElementById('stamp-boards-list').innerHTML = html;
     return;
   }
@@ -2130,6 +2130,7 @@ function renderStampBoards() {
   }).join('');
 
   html += `<div class="stamp-cards-grid">${cards}</div>`;
+  html += `<button class="btn btn-primary" onclick="openAddStampBoard()" style="width:100%;padding:14px;margin-top:8px;">+ 교신일지</button>`;
   document.getElementById('stamp-boards-list').innerHTML = html;
 }
 

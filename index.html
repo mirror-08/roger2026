@@ -1127,6 +1127,7 @@ function openAddRecord(date) {
   document.getElementById('rec-alex').value = '';
   document.getElementById('rec-philo').value = '';
   document.getElementById('rec-zone').value = '';
+  document.getElementById('rec-row').value = '';
   document.getElementById('rec-num').value = '';
   document.getElementById('rec-price').value = '';
   document.getElementById('rec-discount-type').value = '';
@@ -1154,6 +1155,7 @@ function editRecord(id) {
   document.getElementById('rec-alex').value = r.alex;
   document.getElementById('rec-philo').value = r.philo;
   document.getElementById('rec-zone').value = r.seatZone||'';
+  document.getElementById('rec-row').value = r.seatRow != null ? r.seatRow : '';
   document.getElementById('rec-num').value = r.seatNumber||'';
   document.getElementById('rec-price').value = r.price||'';
   document.getElementById('rec-discount-type').value = r.discountType||'';
@@ -1184,7 +1186,7 @@ function saveRecord() {
 
   const records  = getRecords();
   const editId   = document.getElementById('edit-record-id').value;
-  const rowVal   = '';
+  const rowVal   = document.getElementById('rec-row').value;
   const numVal   = document.getElementById('rec-num').value;
   const priceVal = document.getElementById('rec-price').value;
   const isBooked = !document.getElementById('rec-unconfirmed').checked;
@@ -1215,7 +1217,7 @@ function saveRecord() {
   const record = {
     id: editId||uuid(), date, time, alex, philo, isBooked,
     seatZone:     document.getElementById('rec-zone').value||null,
-    seatRow:      null,
+    seatRow:      rowVal!=='' ? parseInt(rowVal) : null,
     seatNumber:   numVal!=='' ? parseInt(numVal) : null,
     price:        priceVal!=='' ? parseInt(priceVal) : null,
     discountType: discountType,
@@ -1327,7 +1329,8 @@ function openDetail(id) {
   if (r.rating) html += `<div class="detail-field"><div class="detail-field-label">별점</div><div style="color:var(--star);font-size:20px;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div></div>`;
   if (r.comment) html += `<div class="detail-field"><div class="detail-field-label">한줄 코멘트</div><div class="detail-field-value">${r.comment}</div></div>`;
   if (r.seatZone) {
-    html += `<div class="detail-field"><div class="detail-field-label">좌석</div><div class="detail-field-value">${r.seatZone}열 ${r.seatNumber}번</div></div>`;
+    const seatLabel = r.seatRow != null ? `${r.seatZone}구역 ${r.seatRow}열 ${r.seatNumber}번` : `${r.seatZone}구역 ${r.seatNumber}번`;
+    html += `<div class="detail-field"><div class="detail-field-label">좌석</div><div class="detail-field-value">${seatLabel}</div></div>`;
     html += buildMiniSeat(r.seatZone, r.seatRow, r.seatNumber);
   }
   if (r.price != null && r.price !== '') html += `<div class="detail-field"><div class="detail-field-label">티켓 가격</div><div class="detail-field-value">₩${r.price.toLocaleString()}${r.discountType ? ` <span style="font-size:11px;color:var(--accent);background:var(--accent-light);padding:2px 6px;border-radius:4px;margin-left:4px;">${DISCOUNT_LABEL[r.discountType] || r.discountType}</span>` : ''}</div></div>`;
@@ -1473,7 +1476,7 @@ function renderHome() {
     const todayD = new Date(today+'T00:00:00');
     const diff  = Math.round((d-todayD)/86400000);
     const dday  = diff===0 ? 'D-DAY' : `D-${diff}`;
-    const seat  = nextShow.seatZone ? `${nextShow.seatZone}열 ${nextShow.seatNumber}번` : '';
+    const seat  = nextShow.seatZone ? (nextShow.seatRow != null ? `${nextShow.seatZone}구역 ${nextShow.seatRow}열 ${nextShow.seatNumber}번` : `${nextShow.seatZone}구역 ${nextShow.seatNumber}번`) : '';
     document.getElementById('home-next-show').innerHTML = `
       <div class="next-show-card" onclick="openDetail('${nextShow.id}')">
         <div class="next-show-dday${diff===0?' today-dday':''}">${dday}${nextShow.isBooked===false ? ' <span style="font-size:14px;opacity:0.7;font-weight:400;">미정</span>' : ''}</div>
@@ -1501,7 +1504,7 @@ function renderHome() {
       const todayD2 = new Date(today+'T00:00:00');
       const diff2 = Math.round((d2-todayD2)/86400000);
       const dday2 = diff2===0 ? 'D-DAY' : `D-${diff2}`;
-      const seat2 = r.seatZone ? `${r.seatZone}열 ${r.seatNumber}번` : '';
+      const seat2 = r.seatZone ? (r.seatRow != null ? `${r.seatZone}구역 ${r.seatRow}열 ${r.seatNumber}번` : `${r.seatZone}구역 ${r.seatNumber}번`) : '';
       return `<div class="upcoming-item" onclick="openDetail('${r.id}')">
         <div class="upcoming-dday" style="${r.isBooked===false ? 'color:var(--text3);' : ''}">${dday2}</div>
         <div class="upcoming-date">${r.date.slice(5)} (${dow[d2.getDay()]}) ${r.time}</div>
@@ -1616,7 +1619,7 @@ function renderHome() {
         <div class="record-mini" onclick="openDetail('${r.id}')">
           <div class="record-date-badge">${r.date.slice(5)} ${r.time}</div>
           <div class="record-casting">${r.alex} · ${r.philo}</div>
-          <div class="record-rating">${r.seatZone ? r.seatZone+'열 '+r.seatNumber+'번' : ''}</div>
+          <div class="record-rating">${r.seatZone ? (r.seatRow != null ? `${r.seatZone}구역 ${r.seatRow}열 ${r.seatNumber}번` : `${r.seatZone}구역 ${r.seatNumber}번`) : ''}</div>
         </div>`).join('');
   const moreEl = document.getElementById('home-recent-more');
   if (showCount < pastAll.length) {

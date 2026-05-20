@@ -412,8 +412,7 @@
   </div>
   <div class="card">
     <div class="card-title">📋 최근 관람</div>
-    <div id="home-recent"></div>
-    <div id="home-recent-more" style="text-align:center;margin-top:6px;"></div>
+    <div id="home-recent" style="max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
   </div>
 </div>
 
@@ -474,7 +473,10 @@
 
   <!-- 전체 이력 표 -->
   <div class="card" style="margin-bottom:16px;">
-    <div class="card-title">할인권 상세 기록</div>
+    <div class="flex-between" style="margin-bottom:4px;">
+      <div class="card-title" style="margin:0;">할인권 상세 기록</div>
+      <button class="btn-icon" id="coupon-history-toggle-icon" onclick="toggleCouponHistory()" style="font-size:13px;">▲</button>
+    </div>
     <div id="coupon-history-wrap">
       <div id="coupon-all-history" style="margin-top:8px;"></div>
     </div>
@@ -863,6 +865,8 @@
         <option value="discount40">40% 할인권</option>
         <option value="discount50">50% 할인권</option>
         <option value="discountPass">증빙패스</option>
+        <option value="doubleStamp">더블적립권</option>
+        <option value="liveOST">실황 OST</option>
       </select>
     </div>
     <div class="form-group">
@@ -1586,25 +1590,14 @@ function renderHome() {
   const pastAll = records
     .filter(r => r.date <= today)
     .sort((a,b)=>b.date.localeCompare(a.date)||b.time.localeCompare(a.time));
-  const showCount = DB.get('homeRecentCount', 3);
-  const past = pastAll.slice(0, showCount);
   document.getElementById('home-recent').innerHTML = pastAll.length===0
     ? '<div style="text-align:center;color:var(--text3);padding:12px;font-size:13px;">기록이 없습니다</div>'
-    : past.map(r=>`
+    : pastAll.map(r=>`
         <div class="record-mini" onclick="openDetail('${r.id}')">
           <div class="record-date-badge">${r.date.slice(5)} ${r.time}</div>
           <div class="record-casting">${r.alex} · ${r.philo}</div>
           <div class="record-rating">${r.seatZone ? (r.seatRow != null ? `${r.seatZone}구역 ${r.seatRow}열 ${r.seatNumber}번` : `${r.seatZone}구역 ${r.seatNumber}번`) : ''}</div>
         </div>`).join('');
-  const moreEl = document.getElementById('home-recent-more');
-  if (showCount < pastAll.length) {
-    const addCount = Math.min(3, pastAll.length - showCount);
-    moreEl.innerHTML = `<button class="btn btn-outline btn-sm" onclick="DB.set('homeRecentCount',${showCount+3});renderHome()">더보기 (+${addCount}건)</button>`;
-  } else if (showCount > 3) {
-    moreEl.innerHTML = `<button class="btn btn-outline btn-sm" onclick="DB.set('homeRecentCount',3);renderHome()">접기</button>`;
-  } else {
-    moreEl.innerHTML = '';
-  }
 }
 
 // ============================================================
@@ -2069,7 +2062,8 @@ function renderStampBoards() {
     return;
   }
 
-  const cards = boards.map(b => {
+  // 카드 배열 생성 (join 전 배열 유지)
+  const cardArr = boards.map(b => {
     const total      = b.totalSlots;
     const paused     = !!b.paused;
     const { cur, final } = calcStampCounts(b);
@@ -2080,7 +2074,6 @@ function renderStampBoards() {
     const milestones = b.milestones || [{ at:3 }, { at:5 }, { at:7 }];
     const nextMs     = [...milestones].sort((a,b2)=>a.at-b2.at).find(m => cur < m.at);
     const toNext     = nextMs ? nextMs.at - cur : null;
-    const mid5done   = cur >= 5;
 
     let statusHtml = '';
     if (paused)               statusHtml = `<div class="stamp-status-row stamp-status-paused">일시정지 중</div>`;
@@ -2118,9 +2111,20 @@ function renderStampBoards() {
         <button class="stamp-history-btn" onclick="openStampHistory('${b.id}')">이력 보기</button>
       </div>
     </div>`;
-  }).join('');
+  });
 
-  html += `<div class="stamp-cards-grid">${cards}</div>`;
+  // 2개씩 페이지로 묶어 좌우 스와이프 (1페이지면 그냥 그리드)
+  const pages = [];
+  for (let i = 0; i < cardArr.length; i += 2) pages.push(cardArr.slice(i, i + 2));
+
+  if (pages.length <= 1) {
+    html += `<div class="stamp-cards-grid">${cardArr.join('')}</div>`;
+  } else {
+    const pageHtml = pages.map(pg =>
+      `<div style="min-width:100%;scroll-snap-align:start;flex-shrink:0;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;box-sizing:border-box;padding:2px 0;">${pg.join('')}</div>`
+    ).join('');
+    html += `<div style="overflow-x:auto;scroll-snap-type:x mandatory;display:flex;-webkit-overflow-scrolling:touch;">${pageHtml}</div>`;
+  }
   document.getElementById('stamp-boards-list').innerHTML = html;
 }
 
@@ -2640,8 +2644,11 @@ function renderCouponList() {
   const records = getRecords();
   const today   = localDate();
 
+  const histCollapsed = DB.get('couponHistoryCollapsed', false);
   const histWrap = document.getElementById('coupon-history-wrap');
-  if (histWrap) histWrap.style.display = '';
+  const histIcon = document.getElementById('coupon-history-toggle-icon');
+  if (histWrap) histWrap.style.display = histCollapsed ? 'none' : '';
+  if (histIcon) histIcon.textContent = histCollapsed ? '▼' : '▲';
 
   // 최종 = 날짜 제한 없이 전체 + 미달성 milestone
   function calcFinal(key) {

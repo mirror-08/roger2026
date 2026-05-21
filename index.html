@@ -2865,11 +2865,24 @@ function init() {
   fetchSchedule(false);
   fetchEvents(false);
 
-  // Service Worker 등록
+  // Service Worker 등록 + 업데이트 시 자동 새로고침
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('SW registered'))
-      .catch(e => console.log('SW failed:', e));
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          // 새 SW가 활성화되면 페이지 자동 새로고침 (최신 버전 적용)
+          if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
+            window.location.reload();
+          }
+        });
+      });
+    }).catch(e => console.log('SW failed:', e));
+
+    // 다른 탭에서 SW가 바뀌었을 때도 새로고침
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
   }
 
   // 설정 탭 업데이트 시간 표시

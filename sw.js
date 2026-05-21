@@ -1,4 +1,4 @@
-const CACHE_NAME = 'roger2026-v30';
+const CACHE_NAME = 'roger2026-v31';
 const BASE = '/roger2026';
 
 // 앱 시작 시 캐시할 파일들
@@ -28,11 +28,29 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// fetch: 네트워크 우선, 실패 시 캐시
+// fetch 전략
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // schedule.json — 네트워크 우선 (최신 스케줄), 실패 시 캐시
+  // index.html / 루트 — 네트워크 우선 (항상 최신 버전)
+  if (
+    url.pathname === BASE + '/' ||
+    url.pathname === BASE + '/index.html' ||
+    url.pathname === BASE
+  ) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // schedule.json / events.json — 네트워크 우선 (최신 스케줄), 실패 시 캐시
   if (url.pathname.endsWith('schedule.json') || url.pathname.endsWith('events.json')) {
     event.respondWith(
       fetch(event.request)
@@ -46,7 +64,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // 나머지 — 캐시 우선, 없으면 네트워크
+  // 나머지 (이미지, manifest 등) — 캐시 우선, 없으면 네트워크
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;

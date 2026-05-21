@@ -401,7 +401,10 @@
     <div id="home-upcoming"></div>
   </div>
   <div class="card">
-    <div class="card-title">🎟 쿠폰 현황</div>
+    <div class="flex-between" style="margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">🎟 쿠폰 현황</div>
+      <button class="btn btn-primary btn-sm" onclick="openAddCouponManual()">+ 할인권 추가/차감</button>
+    </div>
     <div id="home-coupons"></div>
   </div>
   <div class="card">
@@ -463,9 +466,8 @@
 
   <!-- 쿠폰 현황 -->
   <div class="card" style="margin-bottom:16px;">
-    <div class="flex-between" style="margin-bottom:12px;">
+    <div style="margin-bottom:12px;">
       <div class="card-title" style="margin:0;">쿠폰 현황</div>
-      <button class="btn btn-primary btn-sm" onclick="openAddCouponManual()">+ 할인권 추가/차감</button>
     </div>
     <div id="coupon-list"></div>
     <div style="margin-top:8px;font-size:11px;color:var(--text3);text-align:center;">할인권 증정 및 사용 기간: 2026.03.07 ~ 2026.05.31</div>

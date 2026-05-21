@@ -244,14 +244,19 @@
   .stamp-board-menu { display: flex; gap: 3px; align-items: center; flex-shrink: 0; margin-left: 4px; }
   .stamp-menu-btn { width: 24px; height: 24px; border-radius: 6px; background: var(--bg3); border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text2); line-height: 1; }
   .stamp-menu-btn.danger { color: var(--danger); }
-  .stamp-progress-wrap { margin: 6px 0 4px; }
-  .stamp-count-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  /* 스탬프 서클 */
+  .stamp-grid { display: flex; gap: 6px; justify-content: center; padding: 8px 0 0; }
+  .stamp-grid-row { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .stamp-slot { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; background: var(--bg3); flex-shrink: 0; transition: background 0.2s; }
+  .stamp-slot.stamped { background: var(--accent); border-color: var(--accent); color: white; }
+  .stamp-slot.ms3 { border-color: #ff9900; }
+  .stamp-slot.ms7 { border-color: var(--success); }
+  .stamp-slot.ms3.stamped, .stamp-slot.ms7.stamped { border-color: var(--accent); }
+  .stamp-ms-label { font-size: 8px; font-weight: 700; height: 11px; line-height: 11px; }
+  .stamp-count-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
   .stamp-count-cur { font-size: 13px; font-weight: 700; color: var(--accent); }
   .stamp-count-final { font-size: 11px; color: var(--text3); }
-  .progress-bar { width: 100%; height: 12px; background: var(--bg3); border-radius: 6px; overflow: visible; position: relative; }
-  .progress-fill { height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.4s ease; }
-  .progress-marker { position: absolute; top: -3px; width: 2px; height: 18px; background: var(--star); border-radius: 1px; }
-  .stamp-status-row { font-size: 11px; margin-top: 5px; min-height: 16px; }
+  .stamp-status-row { font-size: 11px; margin-top: 6px; min-height: 16px; }
   .stamp-status-mid  { color: #e06000; font-weight: 600; }
   .stamp-status-done { color: var(--star); font-weight: 700; }
   .stamp-status-next { color: var(--text3); }
@@ -1408,6 +1413,7 @@ function deleteCurrentRecord() {
 
 function renderHome() {
   const records = getRecords();
+  const boards  = getStampBoards();
   const today   = localDate();
   const dow     = ['일','월','화','수','목','금','토'];
 
@@ -1997,18 +2003,16 @@ function renderStampBoards() {
     return;
   }
 
-  // 카드 배열 생성 (join 전 배열 유지)
+  // 카드 배열 생성
   const cardArr = boards.map(b => {
-    const total      = b.totalSlots;
-    const paused     = !!b.paused;
+    const total    = b.totalSlots;
+    const paused   = !!b.paused;
     const { cur, final } = calcStampCounts(b);
-    const pct        = Math.min(100, Math.round(cur / total * 100));
-    const finalPct   = Math.min(100, Math.round(final / total * 100));
-    const mid3done   = cur >= 3;
-    const alldone    = cur >= total;
+    const mid3done = cur >= 3;
+    const alldone  = cur >= total;
     const milestones = b.milestones || [{ at:3 }, { at:5 }, { at:7 }];
-    const nextMs     = [...milestones].sort((a,b2)=>a.at-b2.at).find(m => cur < m.at);
-    const toNext     = nextMs ? nextMs.at - cur : null;
+    const nextMs   = [...milestones].sort((a,b2)=>a.at-b2.at).find(m => cur < m.at);
+    const toNext   = nextMs ? nextMs.at - cur : null;
 
     let statusHtml = '';
     if (paused)               statusHtml = `<div class="stamp-status-row stamp-status-paused">일시정지 중</div>`;
@@ -2016,8 +2020,25 @@ function renderStampBoards() {
     else if (mid3done)        statusHtml = `<div class="stamp-status-row stamp-status-mid">🏷 50%할인권×1 달성!</div>`;
     else if (toNext !== null) statusHtml = `<div class="stamp-status-row stamp-status-next">다음까지 ${toNext}개</div>`;
 
-    const marker3 = (3 / total * 100).toFixed(2);
-    const marker7 = (7 / total * 100).toFixed(2);
+    // 스탬프 서클 렌더링
+    const stampsHtml = Array.from({length: total}, (_, i) => {
+      const slotNum  = i + 1;
+      const stamped  = slotNum <= cur;
+      const isFuture = !stamped && slotNum <= final;
+      const isMs3    = slotNum === 3;
+      const isMs7    = slotNum === 7;
+      let cls = 'stamp-slot';
+      if (stamped)       cls += ' stamped';
+      else if (isMs3)    cls += ' ms3';
+      else if (isMs7)    cls += ' ms7';
+      const icon = stamped ? '✈' : (isFuture ? '·' : '');
+      const msLabel = isMs3
+        ? `<div class="stamp-ms-label" style="color:#ff9900;">50%</div>`
+        : isMs7
+          ? `<div class="stamp-ms-label" style="color:var(--success);">OST</div>`
+          : `<div class="stamp-ms-label"></div>`;
+      return `<div class="stamp-grid-row"><div class="${cls}">${icon}</div>${msLabel}</div>`;
+    }).join('');
 
     return `<div class="stamp-board${paused ? ' paused' : ''}">
       <div class="stamp-board-header">
@@ -2032,14 +2053,7 @@ function renderStampBoards() {
         <span class="stamp-count-cur">현재 ${cur}칸</span>
         <span class="stamp-count-final">/ 최종 ${final}칸</span>
       </div>
-      <div class="stamp-progress-wrap">
-        <div class="progress-bar" style="overflow:visible;">
-          <div class="progress-fill" style="width:${finalPct}%;background:var(--border);border-radius:6px;"></div>
-          <div class="progress-fill" style="width:${pct}%;background:${paused ? 'var(--text3)' : 'var(--accent)'};border-radius:6px;margin-top:-12px;position:relative;"></div>
-          <div class="progress-marker" style="left:calc(${marker3}% - 1px);"></div>
-          <div class="progress-marker" style="left:calc(${marker7}% - 1px);background:var(--accent);"></div>
-        </div>
-      </div>
+      <div class="stamp-grid">${stampsHtml}</div>
       ${statusHtml}
       <div class="stamp-actions">
         ${(!alldone && !paused) ? `<button class="btn btn-primary btn-sm" style="width:100%;" onclick="openAddStamp('${b.id}')">+ 도장 찍기</button>` : ''}
@@ -2048,17 +2062,14 @@ function renderStampBoards() {
     </div>`;
   });
 
-  // 2개씩 페이지로 묶어 좌우 스와이프 (1페이지면 그냥 그리드)
-  const pages = [];
-  for (let i = 0; i < cardArr.length; i += 2) pages.push(cardArr.slice(i, i + 2));
-
-  if (pages.length <= 1) {
-    html += `<div class="stamp-cards-grid">${cardArr.join('')}</div>`;
+  // 1개씩 좌우 스와이프 (1개면 그냥 표시)
+  if (cardArr.length === 1) {
+    html += cardArr[0];
   } else {
-    const pageHtml = pages.map(pg =>
-      `<div style="min-width:100%;scroll-snap-align:start;flex-shrink:0;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;box-sizing:border-box;padding:2px 0;">${pg.join('')}</div>`
+    const pageHtml = cardArr.map(card =>
+      `<div style="min-width:100%;scroll-snap-align:start;flex-shrink:0;box-sizing:border-box;padding:2px 0;">${card}</div>`
     ).join('');
-    html += `<div style="overflow-x:auto;scroll-snap-type:x mandatory;display:flex;-webkit-overflow-scrolling:touch;">${pageHtml}</div>`;
+    html += `<div style="overflow-x:auto;scroll-snap-type:x mandatory;display:flex;-webkit-overflow-scrolling:touch;gap:0;">${pageHtml}</div>`;
   }
   document.getElementById('stamp-boards-list').innerHTML = html;
 }

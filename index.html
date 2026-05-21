@@ -60,16 +60,16 @@
   .page.active { display: block; }
 
   /* HEADER */
-  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .page-title { font-size: 22px; font-weight: 700; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .page-title { font-size: 20px; font-weight: 700; }
 
   /* CARD */
   .card {
     background: var(--bg2); border-radius: var(--radius);
-    padding: 16px; margin-bottom: 12px;
+    padding: 12px; margin-bottom: 8px;
     box-shadow: var(--shadow); border: 1px solid var(--border);
   }
-  .card-title { font-size: 13px; color: var(--text3); margin-bottom: 8px; font-weight: 500; }
+  .card-title { font-size: 12px; color: var(--text3); margin-bottom: 6px; font-weight: 500; }
 
   /* BUTTONS */
   .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: opacity 0.2s; }
@@ -128,7 +128,7 @@
   .toggle.on::after { transform: translateX(22px); }
 
   /* RECORD LIST */
-  .record-mini { display: flex; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); cursor: pointer; gap: 10px; }
+  .record-mini { display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); cursor: pointer; gap: 8px; }
   .record-mini:last-child { border-bottom: none; }
   .record-date-badge { background: var(--accent-light); color: var(--accent); border-radius: 8px; padding: 3px 8px; font-size: 12px; font-weight: 600; min-width: 60px; text-align: center; }
   .record-casting { font-size: 13px; font-weight: 500; flex: 1; }
@@ -321,13 +321,13 @@
   [data-theme="dark"] .casting-tag.philo { background: #0a1e40; color: #5ab4e8; }
 
   /* HOME */
-  .next-show-card { background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); border-radius: var(--radius); padding: 18px; margin-bottom: 8px; color: #fff; position: relative; overflow: hidden; cursor: pointer; }
-  .next-show-card::before { content: '✈️'; position: absolute; right: 16px; top: 12px; font-size: 40px; opacity: 0.15; }
-  .next-show-dday { font-size: 32px; font-weight: 900; letter-spacing: -1px; margin-bottom: 4px; }
+  .next-show-card { background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); border-radius: var(--radius); padding: 14px; margin-bottom: 6px; color: #fff; position: relative; overflow: hidden; cursor: pointer; }
+  .next-show-card::before { content: '✈️'; position: absolute; right: 14px; top: 10px; font-size: 34px; opacity: 0.15; }
+  .next-show-dday { font-size: 26px; font-weight: 900; letter-spacing: -1px; margin-bottom: 2px; }
   .next-show-dday.today-dday { color: #ffe066; }
-  .next-show-date { font-size: 13px; opacity: 0.85; margin-bottom: 10px; }
-  .next-show-casting { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-  .next-show-pill { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .next-show-date { font-size: 12px; opacity: 0.85; margin-bottom: 8px; }
+  .next-show-casting { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+  .next-show-pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
   .next-show-pill.sky { background: rgba(255,255,255,0.25); }
   .next-show-pill.philo { background: rgba(180,240,255,0.3); }
   .next-show-seat { font-size: 12px; opacity: 0.75; }
@@ -405,25 +405,26 @@
     <div id="home-upcoming"></div>
   </div>
   <div class="card">
-    <div class="flex-between" style="margin-bottom:12px;">
+    <div class="flex-between" style="margin-bottom:8px;">
       <div class="card-title" style="margin:0;">🎟 쿠폰 현황</div>
       <button class="btn btn-primary btn-sm" onclick="openAddCouponManual()">+ 할인권 추가/차감</button>
     </div>
     <div id="home-coupons"></div>
+    <div style="margin-top:6px;font-size:10px;color:var(--text3);text-align:center;">할인권 증정 및 사용 기간: 2026.03.07 ~ 2026.05.31</div>
   </div>
   <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div style="font-size:12px;font-weight:700;color:var(--text2);">📡 교신일지</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);">📡 교신일지</div>
         <button class="btn btn-outline btn-sm" style="font-size:10px;padding:3px 7px;" onclick="openAddStampBoard()">+ 교신일지</button>
       </div>
-      <div style="font-size:11px;color:var(--text3);">3칸 : 50% 할인권 / 7칸 : OST 실황</div>
+      <div style="font-size:10px;color:var(--text3);">3칸 : 50% 할인권 / 7칸 : OST 실황</div>
     </div>
     <div id="stamp-boards-list"></div>
   </div>
   <div class="card">
     <div class="card-title">📋 최근 관람</div>
-    <div id="home-recent" style="max-height:105px;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
+    <div id="home-recent" style="max-height:90px;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
   </div>
 </div>
 
@@ -464,24 +465,6 @@
     <div id="cal-wrap"></div>
   </div>
   <div id="cal-day-records"></div>
-</div>
-
-<!-- ========== COUPON / STAMP ========== -->
-<div class="page" id="page-coupon">
-  <div class="page-header">
-    <div class="page-title">쿠폰·도장</div>
-  </div>
-
-  <!-- 쿠폰 현황 -->
-  <div class="card" style="margin-bottom:16px;">
-    <div style="margin-bottom:12px;">
-      <div class="card-title" style="margin:0;">쿠폰 현황</div>
-    </div>
-    <div id="coupon-list"></div>
-    <div style="margin-top:8px;font-size:11px;color:var(--text3);text-align:center;">할인권 증정 및 사용 기간: 2026.03.07 ~ 2026.05.31</div>
-  </div>
-
-
 </div>
 
 <!-- ========== STATS ========== -->
@@ -559,7 +542,6 @@
 <nav class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('home',this)"><span class="icon">🏠</span><span>홈</span></button>
   <button class="tab-btn" onclick="switchTab('calendar',this)"><span class="icon">📅</span><span>캘린더</span></button>
-  <button class="tab-btn" onclick="switchTab('coupon',this)"><span class="icon">🎫</span><span>쿠폰</span></button>
   <button class="tab-btn" onclick="switchTab('stats',this)"><span class="icon">😌</span><span>통계</span></button>
   <button class="tab-btn" onclick="switchTab('settings',this)"><span class="icon">⚙️</span><span>설정</span></button>
 </nav>
@@ -973,7 +955,6 @@ function switchTab(name, btn) {
   if (name==='home')     renderHome();
   if (name==='calendar') renderCalendar();
   if (name==='stats')    renderStats();
-  if (name==='coupon')   renderCoupon();
   if (name==='settings') {
     const savedAt = localStorage.getItem('scheduleUpdatedAt');
     const timeEl  = document.getElementById('schedule-update-time');
@@ -2584,6 +2565,7 @@ function getStampAchievedDate(board, at) {
 }
 
 function renderCouponList() {
+  if (!document.getElementById('coupon-list')) return; // 쿠폰 탭 제거됨
   const coupons = getCoupons();
   const boards  = getStampBoards();
   const records = getRecords();
@@ -2811,7 +2793,6 @@ function importData(e) {
       showToast('데이터를 성공적으로 불러왔습니다');
       renderHome();
       renderCalendar();
-      renderCoupon();
       renderStats();
     } catch { showToast('파일 형식 오류'); }
   };
@@ -2827,7 +2808,6 @@ function refreshCurrentPage() {
   if (id==='page-home')     renderHome();
   if (id==='page-calendar') renderCalendar();
   if (id==='page-stats')    renderStats();
-  if (id==='page-coupon')   renderCoupon();
 }
 
 // ============================================================

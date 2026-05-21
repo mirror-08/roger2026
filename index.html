@@ -473,16 +473,6 @@
     <div style="margin-top:8px;font-size:11px;color:var(--text3);text-align:center;">할인권 증정 및 사용 기간: 2026.03.07 ~ 2026.05.31</div>
   </div>
 
-  <!-- 전체 이력 표 -->
-  <div class="card" style="margin-bottom:16px;">
-    <div class="flex-between" style="margin-bottom:4px;">
-      <div class="card-title" style="margin:0;">할인권 상세 기록</div>
-      <button id="coupon-history-toggle-icon" onclick="toggleCouponHistory()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--text3);padding:2px 4px;">▲</button>
-    </div>
-    <div id="coupon-history-wrap">
-      <div id="coupon-all-history" style="margin-top:8px;"></div>
-    </div>
-  </div>
 
   <!-- 다관람 카드 -->
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
@@ -577,6 +567,18 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- ===== COUPON DETAIL PANEL ===== -->
+<div class="overlay" id="overlay-coupon-detail">
+  <div class="panel">
+    <div class="panel-handle"></div>
+    <div class="flex-between" style="margin-bottom:16px;">
+      <div class="panel-title" id="coupon-detail-title"></div>
+      <button class="btn-icon" onclick="closePanel('overlay-coupon-detail')">✕</button>
+    </div>
+    <div id="coupon-detail-content"></div>
+  </div>
+</div>
 
 <!-- ===== ADD/EDIT RECORD PANEL ===== -->
 <div class="overlay" id="overlay-record">
@@ -1418,15 +1420,6 @@ function toggleHomeStamps() {
   DB.set('homeStampsCollapsed', !collapsed);
 }
 
-function toggleCouponHistory() {
-  const wrap = document.getElementById('coupon-history-wrap');
-  const icon = document.getElementById('coupon-history-toggle-icon');
-  if (!wrap) return;
-  const collapsed = wrap.style.display === 'none';
-  wrap.style.display = collapsed ? '' : 'none';
-  icon.textContent   = collapsed ? '▲' : '▼';
-  DB.set('couponHistoryCollapsed', !collapsed);
-}
 
 function renderHome() {
   const records = getRecords();
@@ -1574,7 +1567,7 @@ function renderHome() {
         + boards.reduce((s,b)=>s+(b.milestones||[]).filter(m=>m.couponKey===item.key&&m.notified).reduce((t,m)=>t+(m.qty||1),0),0);
       const used   = records.filter(r=>(DISCOUNT_COUPON_MAP[r.discountType]||null)===item.key).length
         + (coupons[item.key].history||[]).filter(h=>h.type==='사용').reduce((s,h)=>s+(h.qty||1),0);
-      return `<div class="coupon-card">
+      return `<div class="coupon-card" onclick="openCouponDetail('${item.key}')" style="cursor:pointer;">
         <div class="coupon-card-label">${item.label}</div>
         <div class="coupon-card-sub-row">
           <div class="coupon-card-sub">현재</div>
@@ -2646,11 +2639,6 @@ function renderCouponList() {
   const records = getRecords();
   const today   = localDate();
 
-  const histCollapsed = DB.get('couponHistoryCollapsed', false);
-  const histWrap = document.getElementById('coupon-history-wrap');
-  const histIcon = document.getElementById('coupon-history-toggle-icon');
-  if (histWrap) histWrap.style.display = histCollapsed ? 'none' : '';
-  if (histIcon) histIcon.textContent = histCollapsed ? '▼' : '▲';
 
   // 최종 = 날짜 제한 없이 전체 + 미달성 milestone
   function calcFinal(key) {
@@ -2673,7 +2661,7 @@ function renderCouponList() {
       + boards.reduce((s,b)=>s+(b.milestones||[]).filter(m=>m.couponKey===item.key&&m.notified).reduce((t,m)=>t+(m.qty||1),0),0);
     const used   = records.filter(r=>(DISCOUNT_COUPON_MAP[r.discountType]||null)===item.key).length
       + (coupons[item.key].history||[]).filter(h=>h.type==='사용').reduce((s,h)=>s+(h.qty||1),0);
-    return `<div class="coupon-card">
+    return `<div class="coupon-card" onclick="openCouponDetail('${item.key}')" style="cursor:pointer;">
       <div class="coupon-card-label">${item.label}</div>
       <div class="coupon-card-sub-row">
         <div class="coupon-card-sub">현재</div>
@@ -2688,112 +2676,90 @@ function renderCouponList() {
   }).join('')}</div>`;
 
   document.getElementById('coupon-list').innerHTML = cardsHtml;
-  renderCouponAllHistory();
 }
 
-function renderCouponAllHistory() {
-  const coupons = getCoupons();
-  const boards  = getStampBoards();
-  const records = getRecords();
-  const allRows = [];
-  const dow = ['일','월','화','수','목','금','토'];
-
-  // ① 수동 이력 (획득/사용 — 복원·구 달성 보상·관람 연동 사용은 표시 안 함)
-  COUPON_ITEMS.forEach(item => {
-    (coupons[item.key].history || []).forEach((h, idx) => {
-      if (h.type === '복원') return;
-      if (h.comment && (h.comment.includes('달성 보상') || h.comment.includes('칸 달성'))) return;
-      if (h.type === '사용' && h.comment && h.comment.includes('관람 사용')) return;
-      allRows.push({ ...h, key: item.key, short: item.short, originalIdx: idx, rowType: 'manual' });
-    });
-  });
-
-  // ② 도장 달성 보상 — 도장판 notified 상태에서 동적 생성 (삭제 불가)
-  boards.forEach(b => {
-    (b.milestones || []).forEach(m => {
-      if (!m.notified) return;
-      const key = m.couponKey;
-      if (!key) return; // 쿠폰 미연동 마일스톤 (폴라로이드 등) 스킵
-      const item = COUPON_ITEMS.find(i => i.key === key);
-      if (!item) return;
-      const date = getStampAchievedDate(b, m.at);
-      allRows.push({
-        date, type: '획득', key, short: item.short,
-        comment: `[🎫 ${b.name}] ${m.at}칸 달성`,
-        isMilestone: true, qty: 1, originalIdx: -1, rowType: 'milestone'
-      });
-    });
-  });
-
-  // ③ 관람 기록 할인권 사용분 — records에서 동적 생성 (삭제 불가)
-  records.forEach(r => {
-    const key = DISCOUNT_COUPON_MAP[r.discountType] || null;
-    if (!key) return;
-    const item = COUPON_ITEMS.find(i => i.key === key);
-    if (!item) return;
-    allRows.push({
-      date: r.date, type: '사용', key, short: item.short,
-      comment: `${r.alex} · ${r.philo} 관람`,
-      qty: 1, originalIdx: -1, rowType: 'record'
-    });
-  });
-
-  allRows.sort((a, b) => a.date.localeCompare(b.date));
-
-  const el = document.getElementById('coupon-all-history');
-  if (!el) return;
-  if (!allRows.length) {
-    el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;text-align:center;">이력 없음</div>';
-    return;
-  }
-
-  const rows = allRows.map(h => {
-    const d = new Date(h.date + 'T00:00:00');
-    const dateStr = `${parseInt(h.date.slice(5,7))}.${parseInt(h.date.slice(8,10))}(${dow[d.getDay()]})`;
-    const isGet = h.type === '획득';
-    const typeHtml = isGet
-      ? `<span class="hist-type-get">획득</span>`
-      : `<span class="hist-type-use">사용</span>`;
-    const qty   = h.qty || 1;
-    const delta = isGet ? `<span class="hist-delta-pos">+${qty}</span>` : `<span class="hist-delta-neg">-${qty}</span>`;
-    const d40     = h.key === 'discount40'   ? delta : '';
-    const d50     = h.key === 'discount50'   ? delta : '';
-    const dPass   = h.key === 'discountPass' ? delta : '';
-    const dDouble = h.key === 'doubleStamp'  ? delta : '';
-    const milestoneBadge = h.isMilestone ? `<span class="hist-milestone-badge">달성</span>` : '';
-    const memo  = `${h.comment || ''}${milestoneBadge}`;
-    const delBtn = h.rowType === 'manual'
-      ? `<button class="hist-del-btn" onclick="deleteCouponHistoryRow('${h.key}',${h.originalIdx})">✕</button>`
-      : '';
-    return `<tr>
-      <td style="text-align:left;white-space:nowrap;">${dateStr}</td>
-      <td>${typeHtml}</td>
-      <td>${d40}</td><td>${d50}</td><td>${dPass}</td><td>${dDouble}</td>
-      <td style="text-align:left;color:var(--text2);font-size:11px;">${memo}</td>
-      <td>${delBtn}</td>
-    </tr>`;
-  }).join('');
-
-  el.innerHTML = `<table class="coupon-hist-table">
-    <thead><tr>
-      <th style="text-align:center;">날짜</th><th>유형</th><th>40%</th><th>50%</th><th>증빙</th><th>더블</th><th style="text-align:center;">메모</th><th></th>
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
-}
 
 function deleteCouponHistoryRow(key, originalIdx) {
   if (!confirm('이 이력을 삭제하시겠습니까?')) return;
   const coupons = getCoupons();
   coupons[key].history.splice(originalIdx, 1);
-  // count는 renderCouponList에서 calcCouponCount로 실시간 계산하므로 별도 저장 불필요
-  // 하지만 getCoupons()의 count 필드도 맞춰둠
   const boards = getStampBoards();
   coupons[key].count = calcCouponCount(key, coupons, boards);
   saveCoupons(coupons);
   renderCouponList();
   renderHome();
+  // 패널이 열려 있으면 내용 갱신
+  const panel = document.getElementById('overlay-coupon-detail');
+  if (panel && panel.classList.contains('open')) openCouponDetail(key);
   showToast('이력이 삭제되었습니다');
+}
+
+function openCouponDetail(key) {
+  const item = COUPON_ITEMS.find(i => i.key === key);
+  if (!item) return;
+  document.getElementById('coupon-detail-title').textContent = item.label + ' 이력';
+
+  const coupons = getCoupons();
+  const boards  = getStampBoards();
+  const records = getRecords();
+  const dow     = ['일','월','화','수','목','금','토'];
+  const allRows = [];
+
+  // ① 수동 이력
+  (coupons[key].history || []).forEach((h, idx) => {
+    if (h.type === '복원') return;
+    if (h.comment && (h.comment.includes('달성 보상') || h.comment.includes('칸 달성'))) return;
+    if (h.type === '사용' && h.comment && h.comment.includes('관람 사용')) return;
+    allRows.push({ ...h, originalIdx: idx, rowType: 'manual' });
+  });
+
+  // ② 도장판 milestone 달성 보상
+  boards.forEach(b => {
+    (b.milestones || []).forEach(m => {
+      if (!m.notified || m.couponKey !== key) return;
+      const date = getStampAchievedDate(b, m.at);
+      allRows.push({ date, type: '획득', comment: `[🎫 ${b.name}] ${m.at}칸 달성`, isMilestone: true, qty: 1, originalIdx: -1, rowType: 'milestone' });
+    });
+  });
+
+  // ③ 관람 기록 사용분
+  records.forEach(r => {
+    if ((DISCOUNT_COUPON_MAP[r.discountType] || null) !== key) return;
+    allRows.push({ date: r.date, type: '사용', comment: `${r.alex} · ${r.philo} 관람`, qty: 1, originalIdx: -1, rowType: 'record' });
+  });
+
+  allRows.sort((a, b) => a.date.localeCompare(b.date));
+
+  const el = document.getElementById('coupon-detail-content');
+  if (!allRows.length) {
+    el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:12px;text-align:center;">이력 없음</div>';
+  } else {
+    const rows = allRows.map(h => {
+      const d = new Date(h.date + 'T00:00:00');
+      const dateStr = `${parseInt(h.date.slice(5,7))}.${parseInt(h.date.slice(8,10))}(${dow[d.getDay()]})`;
+      const isGet   = h.type === '획득';
+      const typeHtml = isGet ? `<span class="hist-type-get">획득</span>` : `<span class="hist-type-use">사용</span>`;
+      const qty   = h.qty || 1;
+      const delta = isGet ? `<span class="hist-delta-pos">+${qty}</span>` : `<span class="hist-delta-neg">-${qty}</span>`;
+      const badge = h.isMilestone ? `<span class="hist-milestone-badge">달성</span>` : '';
+      const memo  = `${h.comment || ''}${badge}`;
+      const delBtn = h.rowType === 'manual'
+        ? `<button class="hist-del-btn" onclick="deleteCouponHistoryRow('${key}',${h.originalIdx})">✕</button>`
+        : '';
+      return `<tr>
+        <td style="text-align:left;white-space:nowrap;">${dateStr}</td>
+        <td>${typeHtml}</td>
+        <td>${delta}</td>
+        <td style="text-align:left;color:var(--text2);font-size:11px;">${memo}</td>
+        <td>${delBtn}</td>
+      </tr>`;
+    }).join('');
+    el.innerHTML = `<table class="coupon-hist-table">
+      <thead><tr><th>날짜</th><th>유형</th><th>수량</th><th style="text-align:center;">메모</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+  openPanel('overlay-coupon-detail');
 }
 
 function openAddCouponManual() {

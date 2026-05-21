@@ -273,6 +273,7 @@
   .coupon-card-num-row { display: flex; }
   .coupon-card-num { flex: 1; font-size: 18px; font-weight: 700; color: var(--success); line-height: 1; text-align: center; }
   .coupon-card-num.final { color: var(--text3); font-size: 18px; border-left: 1px solid var(--border); }
+  .coupon-earn-row { font-size: clamp(6px, 1.9vw, 9px); color: var(--text3); text-align: center; margin-top: 4px; white-space: nowrap; overflow: hidden; }
   /* 이력 표 */
   .coupon-hist-table { width: 100%; border-collapse: collapse; font-size: 12px; }
   .coupon-hist-table th { padding: 5px 4px; border-bottom: 2px solid var(--border); color: var(--text2); font-weight: 600; text-align: center; }
@@ -1523,7 +1524,7 @@ function renderHome() {
           <div class="coupon-card-num">${item.cur}</div>
           <div class="coupon-card-num final">${item.final}</div>
         </div>
-        <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px;">적립 ${earned} · 사용 ${used}</div>
+        <div class="coupon-earn-row">적립 ${earned} · 사용 ${used}</div>
       </div>`;
     }).join('')}</div>`;
 
@@ -2623,7 +2624,7 @@ function renderCouponList() {
         <div class="coupon-card-num">${cur}</div>
         <div class="coupon-card-num final">${final}</div>
       </div>
-      <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px;">적립 ${earned} · 사용 ${used}</div>
+      <div class="coupon-earn-row">적립 ${earned} · 사용 ${used}</div>
     </div>`;
   }).join('')}</div>`;
 

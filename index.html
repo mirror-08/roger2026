@@ -408,10 +408,14 @@
     <div id="home-coupons"></div>
   </div>
   <div class="card">
-    <div class="card-title">📡 교신일지 현황</div>
-    <div id="home-stamps-wrap">
-      <div id="home-stamps" style="margin-top:8px;"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text2);">📡 교신일지</div>
+        <button class="btn btn-outline btn-sm" onclick="openAddStampBoard()">+ 교신일지</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);">3칸 : 50% 할인권 / 7칸 : OST 실황</div>
     </div>
+    <div id="stamp-boards-list"></div>
   </div>
   <div class="card">
     <div class="card-title">📋 최근 관람</div>
@@ -474,15 +478,6 @@
   </div>
 
 
-  <!-- 다관람 카드 -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div style="font-size:12px;font-weight:700;color:var(--text2);">교신일지</div>
-      <button class="btn btn-outline btn-sm" onclick="openAddStampBoard()">+ 교신일지</button>
-    </div>
-    <div style="font-size:11px;color:var(--text3);">3칸 : 50% 할인권 / 7칸 : OST 실황</div>
-  </div>
-  <div id="stamp-boards-list" style="margin-bottom:16px;"></div>
 </div>
 
 <!-- ========== STATS ========== -->
@@ -1409,16 +1404,6 @@ function deleteCurrentRecord() {
 // ============================================================
 // HOME
 // ============================================================
-function toggleHomeStamps() {
-  const wrap = document.getElementById('home-stamps-wrap');
-  const icon = document.getElementById('home-stamps-toggle-icon');
-  if (!wrap) return;
-  const collapsed = wrap.style.display === 'none';
-  wrap.style.display = collapsed ? '' : 'none';
-  icon.textContent   = collapsed ? '▲' : '▼';
-  // 상태 저장
-  DB.set('homeStampsCollapsed', !collapsed);
-}
 
 
 function renderHome() {
@@ -1427,12 +1412,6 @@ function renderHome() {
   const dow     = ['일','월','화','수','목','금','토'];
 
   // 교신일지 접힘 상태 복원
-  const stampsCollapsed = DB.get('homeStampsCollapsed', false);
-  const stampsWrap = document.getElementById('home-stamps-wrap');
-  const stampsIcon = document.getElementById('home-stamps-toggle-icon');
-  if (stampsWrap) stampsWrap.style.display = stampsCollapsed ? 'none' : '';
-  if (stampsIcon) stampsIcon.textContent   = stampsCollapsed ? '▼' : '▲';
-
   // 예매확정 + 미정 포함 미래 일정
   const upcoming = records
     .filter(r => r.date >= today)
@@ -1487,47 +1466,8 @@ function renderHome() {
     upcomingCard.style.display = 'none';
   }
 
-  // ③ 도장판 (슬라이드 카드)
-  const boards = getStampBoards();
-  if (boards.length === 0) {
-    document.getElementById('home-stamps').innerHTML =
-      `<div style="color:var(--text3);font-size:13px;text-align:center;padding:8px;">도장판이 없습니다</div>`;
-  } else {
-    const slides = boards.map(b => {
-      const { cur, final } = calcStampCounts(b);
-      const total = b.totalSlots || 7;
-      const done  = cur >= total;
-      let dots = '';
-      for (let i = 1; i <= total; i++) {
-        const filled    = i <= cur;
-        const scheduled = i > cur && i <= final;
-        const ms = (b.milestones||[]).find(m => m.at === i);
-        const msLabel = ms ? (i === 3 ? '50%' : i === 7 ? 'OST' : '') : '';
-        dots += `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <div style="width:36px;height:36px;border-radius:50%;
-            background:${filled ? 'transparent' : scheduled ? 'rgba(26,95,255,0.08)' : 'var(--bg3)'};
-            border:2px solid ${filled ? 'var(--accent)' : scheduled ? 'var(--accent)' : 'var(--border)'};
-            display:flex;align-items:center;justify-content:center;font-size:18px;">
-            ${filled ? '📻' : ''}
-          </div>
-          <div style="font-size:8px;font-weight:700;color:${msLabel ? 'var(--accent)' : 'transparent'};">${msLabel||'.'}</div>
-        </div>`;
-      }
-      const cardStyle = boards.length === 1
-        ? 'width:100%;'
-        : 'min-width:100%;scroll-snap-align:start;flex-shrink:0;';
-      return `<div style="${cardStyle}box-sizing:border-box;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 12px;">
-        <div style="font-size:13px;font-weight:700;color:var(--text1);margin-bottom:12px;">[📻 ${b.name}]${done?' 🎉':''}</div>
-        <div style="display:flex;gap:6px;justify-content:center;margin-bottom:4px;">${dots}</div>
-        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:4px;">현재 ${cur}칸 · 예정 ${final}칸</div>
-      </div>`;
-    }).join('');
-    const wrapStyle = boards.length === 1
-      ? ''
-      : 'overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;display:flex;-webkit-overflow-scrolling:touch;padding:2px 0 6px;';
-    document.getElementById('home-stamps').innerHTML =
-      `<div style="${wrapStyle}">${slides}</div>`;
-  }
+  // ③ 교신일지 (풀 카드, stamp-boards-list 공유)
+  renderStampBoards();
 
   // ④ 쿠폰
   const coupons = getCoupons();
@@ -2025,7 +1965,7 @@ const ACTOR_ROLES = [
 // ============================================================
 // COUPON / STAMP
 // ============================================================
-function renderCoupon() { renderStampBoards(); renderCouponList(); }
+function renderCoupon() { renderCouponList(); }
 
 function calcStampCounts(b) {
   // 현재: 오늘 날짜까지 찍힌 도장 수

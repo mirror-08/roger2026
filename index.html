@@ -245,24 +245,23 @@
   .stamp-menu-btn { width: 24px; height: 24px; border-radius: 6px; background: var(--bg3); border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text2); line-height: 1; }
   .stamp-menu-btn.danger { color: var(--danger); }
   /* 스탬프 서클 */
-  .stamp-grid { display: flex; gap: 6px; justify-content: center; padding: 8px 0 0; }
+  .stamp-grid { display: flex; gap: 5px; justify-content: center; padding: 6px 0 0; }
   .stamp-grid-row { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .stamp-slot { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; background: var(--bg3); flex-shrink: 0; transition: background 0.2s; }
-  .stamp-slot.stamped { background: var(--accent); border-color: var(--accent); color: white; }
-  .stamp-slot.ms3 { border-color: #ff9900; }
-  .stamp-slot.ms7 { border-color: var(--success); }
-  .stamp-slot.ms3.stamped, .stamp-slot.ms7.stamped { border-color: var(--accent); }
-  .stamp-ms-label { font-size: 8px; font-weight: 700; height: 11px; line-height: 11px; }
+  .stamp-slot { width: 32px; height: 32px; border-radius: 50%; border: 2.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; background: #e8e8ec; flex-shrink: 0; transition: border-color 0.2s; }
+  .stamp-slot.stamped { background: white; border-color: var(--accent); border-width: 2.5px; }
+  .stamp-slot.ms3 { border-color: var(--accent); }
+  .stamp-slot.ms7 { border-color: var(--accent); }
+  .stamp-ms-label { font-size: 8px; font-weight: 700; height: 11px; line-height: 11px; color: var(--accent); }
   .stamp-count-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
-  .stamp-count-cur { font-size: 13px; font-weight: 700; color: var(--accent); }
-  .stamp-count-final { font-size: 11px; color: var(--text3); }
-  .stamp-status-row { font-size: 11px; margin-top: 6px; min-height: 16px; }
+  .stamp-count-cur { font-size: 12px; font-weight: 700; color: var(--accent); }
+  .stamp-count-final { font-size: 10px; color: var(--text3); }
+  .stamp-status-row { font-size: 11px; margin-top: 4px; min-height: 15px; }
   .stamp-status-mid  { color: #e06000; font-weight: 600; }
   .stamp-status-done { color: var(--star); font-weight: 700; }
   .stamp-status-next { color: var(--text3); }
   .stamp-status-paused { color: var(--text3); font-style: italic; }
-  .stamp-actions { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
-  .stamp-history-btn { width: 100%; padding: 6px; border-radius: 7px; background: var(--bg3); border: 1px solid var(--border); cursor: pointer; font-size: 12px; color: var(--text2); font-weight: 500; text-align: center; }
+  .stamp-actions { margin-top: 7px; display: flex; flex-direction: row; gap: 5px; }
+  .stamp-history-btn { flex: 1; padding: 5px 4px; border-radius: 7px; background: var(--bg3); border: 1px solid var(--border); cursor: pointer; font-size: 11px; color: var(--text2); font-weight: 500; text-align: center; }
 
   /* 쿠폰 가로 카드 */
   .coupon-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
@@ -416,7 +415,7 @@
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
       <div style="display:flex;align-items:center;gap:8px;">
         <div style="font-size:12px;font-weight:700;color:var(--text2);">📡 교신일지</div>
-        <button class="btn btn-outline btn-sm" onclick="openAddStampBoard()">+ 교신일지</button>
+        <button class="btn btn-outline btn-sm" style="font-size:10px;padding:3px 7px;" onclick="openAddStampBoard()">+ 교신일지</button>
       </div>
       <div style="font-size:11px;color:var(--text3);">3칸 : 50% 할인권 / 7칸 : OST 실황</div>
     </div>
@@ -2022,27 +2021,27 @@ function renderStampBoards() {
 
     // 스탬프 서클 렌더링
     const stampsHtml = Array.from({length: total}, (_, i) => {
-      const slotNum  = i + 1;
-      const stamped  = slotNum <= cur;
-      const isFuture = !stamped && slotNum <= final;
-      const isMs3    = slotNum === 3;
-      const isMs7    = slotNum === 7;
+      const slotNum = i + 1;
+      const stamped = slotNum <= cur;
+      const isMs3   = slotNum === 3;
+      const isMs7   = slotNum === 7;
       let cls = 'stamp-slot';
-      if (stamped)       cls += ' stamped';
-      else if (isMs3)    cls += ' ms3';
-      else if (isMs7)    cls += ' ms7';
-      const icon = stamped ? '✈' : (isFuture ? '·' : '');
+      if (stamped)     cls += ' stamped';
+      else if (isMs3)  cls += ' ms3';
+      else if (isMs7)  cls += ' ms7';
+      // 찍힌 칸: 📻 아이콘 / 빈 칸: 아무것도 없음
+      const icon = stamped ? '📻' : '';
       const msLabel = isMs3
-        ? `<div class="stamp-ms-label" style="color:#ff9900;">50%</div>`
+        ? `<div class="stamp-ms-label">50%</div>`
         : isMs7
-          ? `<div class="stamp-ms-label" style="color:var(--success);">OST</div>`
+          ? `<div class="stamp-ms-label">OST</div>`
           : `<div class="stamp-ms-label"></div>`;
       return `<div class="stamp-grid-row"><div class="${cls}">${icon}</div>${msLabel}</div>`;
     }).join('');
 
-    return `<div class="stamp-board${paused ? ' paused' : ''}">
-      <div class="stamp-board-header">
-        <div class="stamp-board-name">[📡 ${b.name}]</div>
+    return `<div class="stamp-board${paused ? ' paused' : ''}" style="padding:10px;">
+      <div class="stamp-board-header" style="margin-bottom:6px;">
+        <div class="stamp-board-name" style="font-size:13px;">[📡 ${b.name}]</div>
         <div class="stamp-board-menu">
           <button class="stamp-menu-btn" onclick="renameStampBoard('${b.id}')" title="이름 변경">📝</button>
           <button class="stamp-menu-btn" onclick="togglePauseStampBoard('${b.id}')" title="${paused ? '재개' : '일시정지'}">${paused ? '▶' : '⏸'}</button>
@@ -2056,7 +2055,7 @@ function renderStampBoards() {
       <div class="stamp-grid">${stampsHtml}</div>
       ${statusHtml}
       <div class="stamp-actions">
-        ${(!alldone && !paused) ? `<button class="btn btn-primary btn-sm" style="width:100%;" onclick="openAddStamp('${b.id}')">+ 도장 찍기</button>` : ''}
+        ${(!alldone && !paused) ? `<button class="btn btn-primary btn-sm" style="flex:1;font-size:11px;padding:5px 4px;" onclick="openAddStamp('${b.id}')">+ 도장 찍기</button>` : ''}
         <button class="stamp-history-btn" onclick="openStampHistory('${b.id}')">이력 보기</button>
       </div>
     </div>`;

@@ -1439,8 +1439,8 @@ function renderHome() {
         <div class="next-show-dday${diff===0?' today-dday':''}">${dday}${nextShow.isBooked===false ? ' <span style="font-size:14px;opacity:0.7;font-weight:400;">미정</span>' : ''}</div>
         <div class="next-show-date">${nextShow.date} (${dow[d.getDay()]}) ${nextShow.time}</div>
         <div class="next-show-casting">
-          <span class="next-show-pill sky">스카일러 ${nextShow.alex}</span>
-          <span class="next-show-pill philo">디디 ${nextShow.philo}</span>
+          <span class="next-show-pill sky"><span style="font-size:9px;opacity:0.8;font-weight:400;">스카일러 </span>${nextShow.alex}</span>
+          <span class="next-show-pill philo"><span style="font-size:9px;opacity:0.8;font-weight:400;">디디 </span>${nextShow.philo}</span>
         </div>
         ${seat ? `<div class="next-show-seat">${seat}</div>` : ''}
       </div>`;

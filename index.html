@@ -1528,7 +1528,7 @@ function renderHome() {
   });
   document.getElementById('home-coupons').innerHTML =
     `<div class="coupon-cards">${couponCardHtml.slice(0,3).join('')}</div>` +
-    `<div class="coupon-cards" style="margin-top:6px;">${couponCardHtml[3]}<div></div>${couponCardHtml[4]}</div>`;
+    `<div class="coupon-cards" style="margin-top:6px;">${couponCardHtml[3]}${couponCardHtml[4]}<div></div></div>`;
 
   // ⑤ 최근 관람 (오늘 포함 이전 기록)
   const pastAll = records

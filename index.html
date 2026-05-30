@@ -2369,12 +2369,15 @@ function updateStampSessionOptions() {
   const exchangeMemoGroup = document.getElementById('stamp-exchange-memo-group');
   if (exchangeMemoGroup) exchangeMemoGroup.style.display = method === '교환' ? '' : 'none';
 
-  // 더블적립 → 2개, 트리플적립 → 3개 자동 선택
+  // 방식에 따라 수량 자동 선택
   if (method === '더블적립') {
     const qtyEl = document.querySelector('input[name="stamp-qty"][value="2"]');
     if (qtyEl) { qtyEl.checked = true; updateQtyLabel(); }
   } else if (method === '트리플적립') {
     const qtyEl = document.querySelector('input[name="stamp-qty"][value="3"]');
+    if (qtyEl) { qtyEl.checked = true; updateQtyLabel(); }
+  } else {
+    const qtyEl = document.querySelector('input[name="stamp-qty"][value="1"]');
     if (qtyEl) { qtyEl.checked = true; updateQtyLabel(); }
   }
 

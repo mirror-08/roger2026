@@ -171,7 +171,8 @@
   .cal-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
   /* 날짜 클릭 패널 */
   .cal-day-panel { background: var(--bg1); border-radius: var(--radius); border: 1px solid var(--border); margin-top: 8px; overflow: hidden; }
-  .cal-day-panel-title { font-size: 14px; font-weight: 700; padding: 12px 14px 8px; }
+  .cal-day-panel-title { font-size: 14px; font-weight: 700; padding: 12px 14px 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .cal-day-event-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
   .cal-session-row { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-top: 1px solid var(--border); }
   .cal-session-time { font-size: 12px; font-weight: 700; color: var(--text2); min-width: 36px; text-align: center; }
   .cal-session-casting { flex: 1; font-size: 13px; }
@@ -1760,7 +1761,7 @@ function renderCalendar() {
   document.getElementById('cal-wrap').innerHTML = html;
 
   if (calSelectedDs) {
-    renderCalDayPanel(calSelectedDs, schByDate[calSelectedDs]||[], doneSet, bookedSet, records);
+    renderCalDayPanel(calSelectedDs, schByDate[calSelectedDs]||[], doneSet, bookedSet, records, events);
   } else {
     document.getElementById('cal-day-records').innerHTML = '';
   }
@@ -1777,13 +1778,18 @@ function calDayClick(ds) {
   renderCalendar();
 }
 
-function renderCalDayPanel(ds, daySch, doneSet, bookedSet, records) {
+function renderCalDayPanel(ds, daySch, doneSet, bookedSet, records, events) {
   const dow  = ['일','월','화','수','목','금','토'];
   const d    = new Date(ds+'T00:00:00');
   const dateLabel = `${parseInt(ds.slice(5,7))}월 ${parseInt(ds.slice(8,10))}일 (${dow[d.getDay()]})`;
   const dayRecords = records.filter(r => r.date === ds);
 
-  let html = `<div class="cal-day-panel"><div class="cal-day-panel-title">${dateLabel}</div>`;
+  const dayEvents = getEventsForDate(ds, events || []);
+  const eventBadges = dayEvents.map(ev =>
+    `<span class="cal-day-event-badge" style="background:${ev.color}22;color:${ev.color};border:1px solid ${ev.color}55;">${ev.name}</span>`
+  ).join('');
+
+  let html = `<div class="cal-day-panel"><div class="cal-day-panel-title"><span>${dateLabel}</span>${eventBadges}</div>`;
 
   const sorted = [...daySch].sort((a,b) => a.time.localeCompare(b.time));
   if (sorted.length) {
